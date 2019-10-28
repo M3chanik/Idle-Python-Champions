@@ -2,46 +2,48 @@ import pyautogui
 import time
 
 
-def click_button(imgdetected, imgname):
+def click_button(imgname, imagefile):
+    imgdetected = pyautogui.locateOnScreen(imagefile)
     if imgdetected:
-        print(imgname + ' found at ' + str(imgdetected))
-        x = imgdetected.left + 2
-        y = imgdetected.top + 2
-        pyautogui.click(x=(x), y=(y), button='left')
+        while imgdetected:
+            print(imgname + ' found at ' + str(imgdetected))
+            x = imgdetected.left + 2
+            y = imgdetected.top + 2
+            pyautogui.click(x=(x), y=(y), button='left')
+            imgdetected = pyautogui.locateOnScreen(imagefile)
     else:
         print('No ' + imgname + ' yet')
 
+
+autoprogresscounter = 60
+autoprogressdelay = 60
+
 for i in range(100):
-    selectbutton = pyautogui.locateOnScreen('SelectButton.png')
-    click_button(selectbutton, 'SelectButton')
-    bluecoin = pyautogui.locateOnScreen('BlueCoin.png')
-    greencoin = pyautogui.locateOnScreen('GreenCoin.png')
-    click_button(greencoin, 'GreenCoin')
+    # Check for Boss level
+    bosstime = pyautogui.locateOnScreen('BossTime.png')
+    if bosstime:
+        print('BOSS FIGHT')
+        time.sleep(15)
+        pyautogui.click(x=(bosstime.left), y=(bosstime.top), button='left')
+        pyautogui.typewrite(['1', '2', '3', '4', '5', '6', '7', '8'])
+
+    # Check for Upgrades
+    click_button('SelectButton', 'SelectButton.png')
+
+    click_button('BlueCoin', 'BlueCoin.png')
+
+    click_button('GreenCoin', 'GreenCoin.png')
+
+    # Check for Autoprogress and if dying has triggered, wait for a minute to level up.
     autoprogress = pyautogui.locateOnScreen('autoprogress.png')
-    '''
-    if selectbutton:
-        print('Green button found at ' + str(selectbutton))
-        x = selectbutton.left + 2
-        y = selectbutton.top + 2
-        pyautogui.click(x=(x), y=(y), button='left')
-    else:
-        print('No Select buttons yet')
-    '''
-
-    if bluecoin:
-        print('Blue Coin found at ' + str(bluecoin))
-        x = bluecoin.left + 2
-        y = bluecoin.top + 2
-        pyautogui.click(x=(x), y=(y), button='left')
-    else:
-        print('No blue coin yet')
-
     if autoprogress:
-        print('Auto Progress is off: ' + str(autoprogress))
-        x = autoprogress.left + 2
-        y = autoprogress.top + 2
-        pyautogui.click(x=(x), y=(y), button='left')
+        if autoprogresscounter < autoprogressdelay:
+            print('Autoprogress delayed for ' + str(autoprogressdelay-autoprogresscounter))
+            autoprogresscounter +=1
+        else:
+            click_button('AutoProgress', 'autoprogress.png')
     else:
         print('Auto progress [ON]')
+        autoprogresscounter = 0
 
-    pyautogui.PAUSE = 1
+    #pyautogui.PAUSE = 1
